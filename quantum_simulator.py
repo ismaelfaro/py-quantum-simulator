@@ -51,33 +51,61 @@ class QuantumCircuit:
     def __repr__(self):
         return str(self.circuit)
 class QuantumSimulator:
-    pass
+    def __init__(self, quantum_circuit):
+        self.circuit = quantum_circuit.circuit
+        self.Qubits =  quantum_circuit.Qubits
+        self.Bits =  self.Qubits
+        self.state_vector = []
+    
+    def initialize_state_vector(self):
+        self.state_vector = [[0.0,0.0] for _ in range(2**self.Qubits)] 
+        self.state_vector[0] = [1.0,0.0] 
+
+    def run(self, shots=1024, format="statevector"):
+        self.initialize_state_vector()
+        for gate in self.circuit:
+            if gate[0] in ['x','h','rx']:
+                qubit = gate[1]
+                for counter_qubit in range(2**qubit):
+                    for counter_state in range(2**(self.Qubits-qubit-1)):
+                        qb0=counter_qubit+(2**qubit+1)*counter_state
+                        qb1=qb0+(2**qubit)
+                        if gate[0]=='x':
+                            temp = self.state_vector[qb0]
+                            self.state_vector[qb0] = self.state_vector[qb1]
+                            self.state_vector[qb1] = temp
+
+                print(gate[0])
+            elif gate[0] == 'cx':
+                print(gate[0])
+
+    def __repr__(self):
+        return str(self.state_vector)
 
 if __name__ == "__main__":
     print("Quantum Simulator for Developers project")
     qc = QuantumCircuit(5)
     qc.x(0)
     
-    qc.x(1)
-    qc.x(0)
-    qc.x(2)
-    qc.z(0)
-    qc.x(0)
+    # qc.x(1)
+    # qc.x(0)
+    # qc.x(2)
+    # qc.z(0)
+    # qc.x(0)
     
-    qc.h(2)
-    qc.h(0)
-    qc.h(1)
+    # qc.h(2)
+    # qc.h(0)
+    # qc.h(1)
     
-    qc.cx(0,1)
-    qc.cx(0,1)
-    qc.m(0,0)
+    # qc.cx(0,1)
+    # qc.cx(0,1)
+    # qc.m(0,0)
 
     print(qc)
-    # print(qc.circuit)
     
-    # quantumSimulator =  QuantumSimulator(qc)
-    # stateVector = quantumSimulator.run("statevector")
-    # print(stateVector)
+    quantumSimulator =  QuantumSimulator(qc)
+    quantumSimulator.run()
+    print(quantumSimulator)
     # result = quantumSimulator.run("counts", 1024)
     # print(result)
     pass
