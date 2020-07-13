@@ -61,9 +61,14 @@ class QuantumSimulator:
         self.state_vector = [[0.0,0.0] for _ in range(2**self.Qubits)] 
         self.state_vector[0] = [1.0,0.0] 
 
-    def superposition(self,x,y):
+    def superposition(self, x, y):
         return [[r2*(x[0]+y[0]),r2*(x[1]+y[1])],
                 [r2*(x[0]-y[0]),r2*(x[1]-y[1])]]
+    
+    def turn(self, x, y, theta):
+        part1 = [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)]
+        part2 = [y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
+        return [ part1, part2]
     
     def run(self, shots=1024, format="statevector"):
         self.initialize_state_vector()
@@ -82,8 +87,12 @@ class QuantumSimulator:
                             superpositionResult = self.superposition(self.state_vector[qb0],self.state_vector[qb1])
                             self.state_vector[qb0] = superpositionResult[0]
                             self.state_vector[qb1] = superpositionResult[1]
+                        if gate[0]=='rx':
+                            theta = gate[2]
+                            turn = self.turn(self.state_vector[qb0],self.state_vector[qb1],theta)
+                            self.state_vector[qb0] = turn[0]
+                            self.state_vector[qb1] = turn[1]
 
-                print(gate[0])
             elif gate[0] == 'cx':
                 print(gate[0])
 
@@ -95,13 +104,14 @@ if __name__ == "__main__":
     qc = QuantumCircuit(5)
     qc.x(0)
     qc.x(1)
-    # qc.x(0)
+    qc.rx(0,pi)
     # qc.x(2)
-    # qc.z(0)
+    qc.z(0)
     # qc.x(0)
     
+    qc.h(0)
     qc.h(1)
-    # qc.h(0)
+
     # qc.h(1)
     
     # qc.cx(0,1)
