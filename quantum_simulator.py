@@ -61,6 +61,10 @@ class QuantumSimulator:
         self.state_vector = [[0.0,0.0] for _ in range(2**self.Qubits)] 
         self.state_vector[0] = [1.0,0.0] 
 
+    def superposition(self,x,y):
+        return [[r2*(x[0]+y[0]),r2*(x[1]+y[1])],
+                [r2*(x[0]-y[0]),r2*(x[1]-y[1])]]
+    
     def run(self, shots=1024, format="statevector"):
         self.initialize_state_vector()
         for gate in self.circuit:
@@ -74,6 +78,10 @@ class QuantumSimulator:
                             temp = self.state_vector[qb0]
                             self.state_vector[qb0] = self.state_vector[qb1]
                             self.state_vector[qb1] = temp
+                        if gate[0]=='h':
+                            superpositionResult = self.superposition(self.state_vector[qb0],self.state_vector[qb1])
+                            self.state_vector[qb0] = superpositionResult[0]
+                            self.state_vector[qb1] = superpositionResult[1]
 
                 print(gate[0])
             elif gate[0] == 'cx':
@@ -86,14 +94,13 @@ if __name__ == "__main__":
     print("Quantum Simulator for Developers project")
     qc = QuantumCircuit(5)
     qc.x(0)
-    
-    # qc.x(1)
+    qc.x(1)
     # qc.x(0)
     # qc.x(2)
     # qc.z(0)
     # qc.x(0)
     
-    # qc.h(2)
+    qc.h(1)
     # qc.h(0)
     # qc.h(1)
     
