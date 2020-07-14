@@ -27,8 +27,8 @@ class QuantumCircuit:
     def h(self, qubit):
         self.add_gate(['h',qubit])
 
-    def cx(self, qubit, target):
-        self.add_gate(['cx',qubit,target])
+    def cx(self, control, target):
+        self.add_gate(['cx',control, target])
 
     def rx(self, qubit, theta):
         self.add_gate(['rx',qubit, theta])
@@ -80,13 +80,13 @@ class QuantumSimulator:
                         qb0=counter_qubit+(2**qubit+1)*counter_state
                         qb1=qb0+(2**qubit)
                         if gate[0]=='x':
-                            temp = self.state_vector[qb0]
-                            self.state_vector[qb0] = self.state_vector[qb1]
-                            self.state_vector[qb1] = temp
+                            self.state_vector[qb0], self.state_vector[qb1] = self.state_vector[qb1], self.state_vector[qb0]
+                            
                         if gate[0]=='h':
                             superpositionResult = self.superposition(self.state_vector[qb0],self.state_vector[qb1])
                             self.state_vector[qb0] = superpositionResult[0]
                             self.state_vector[qb1] = superpositionResult[1]
+
                         if gate[0]=='rx':
                             theta = gate[2]
                             turn = self.turn(self.state_vector[qb0],self.state_vector[qb1],theta)
@@ -94,8 +94,19 @@ class QuantumSimulator:
                             self.state_vector[qb1] = turn[1]
 
             elif gate[0] == 'cx':
-                print(gate[0])
+                control = gate[1]
+                target = gate[2]
 
+                [low,high] = sorted([control,target])
+         
+                for cx0 in range(2**low):
+                    limit_cx2 = 2**(high-low-1)
+                    for cx1 in range(limit_cx2):
+                        for cx2 in range(2**(self.Qubits-high-1)):
+                            qb0 = cx0 + 2**(low+1)*cx1 + 2**(high+1)*cx2 + 2**control  
+                            qb1 = qb0 + 2**target 
+                            self.state_vector[qb0],self.state_vector[qb1] = self.state_vector[qb1],self.state_vector[qb0]
+                           
     def __repr__(self):
         return str(self.state_vector)
 
@@ -105,7 +116,7 @@ if __name__ == "__main__":
     qc.x(0)
     qc.x(1)
     qc.rx(0,pi)
-    # qc.x(2)
+    qc.x(2)
     qc.z(0)
     # qc.x(0)
     
@@ -114,8 +125,8 @@ if __name__ == "__main__":
 
     # qc.h(1)
     
-    # qc.cx(0,1)
-    # qc.cx(0,1)
+    qc.cx(0,1)
+    qc.cx(1,0)
     # qc.m(0,0)
 
     print(qc)
