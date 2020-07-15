@@ -94,7 +94,6 @@ class QuantumSimulator:
 
     def get_counts(self, shots):
         probabilities = self.probability(shots)
-        # print(probabilities)
         counts = {}
         for element in probabilities:
             if(element in counts):
