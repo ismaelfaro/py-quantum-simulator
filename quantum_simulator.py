@@ -63,10 +63,12 @@ class QuantumSimulator:
         self.statevector[0] = [1.0,0.0] 
 
     def superposition(self, x, y):
+        '''For two elements of the statevector, x and y, return (x+y)/sqrt(2) and (x-y)/sqrt(2)'''
         return [[r2*(x[0]+y[0]),r2*(x[1]+y[1])],
                 [r2*(x[0]-y[0]),r2*(x[1]-y[1])]]
     
     def turn(self, x, y, theta):
+        '''For two elements of the statevector, x and y, return cos(theta/2)*x - i*sin(theta/2)*y and cos(theta/2)*y - i*sin(theta/2)*x'''
         part1 = [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)]
         part2 = [y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
         return [ part1, part2]
