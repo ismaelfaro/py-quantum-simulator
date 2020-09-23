@@ -1,7 +1,7 @@
 # Py Quantum Simulator 
 
 This is a very basic implementation of a Quantum Simulator in Python to learn the basic component.
-Allow to create your Quantum circuits with the basic Quantum Gates, and you can execute it in Nodejs or in your browser in a simple way.
+Allow to create your Quantum circuits with the basic Quantum Gates, and you can execute it using plain python
 
 # Components
 - Quantum Circuit Class:
