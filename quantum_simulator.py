@@ -56,26 +56,26 @@ class QuantumSimulator:
         self.circuit = quantum_circuit.circuit
         self.Qubits =  quantum_circuit.Qubits
         self.Bits =  self.Qubits
-        self.statevector = []
+        self.state_vector = []
     
-    def initialize_statevector(self):
-        self.statevector = [[0.0,0.0] for _ in range(2**self.Qubits)] 
-        self.statevector[0] = [1.0,0.0] 
+    def initialize_state_vector(self):
+        self.state_vector = [[0.0,0.0] for _ in range(2**self.Qubits)] 
+        self.state_vector[0] = [1.0,0.0] 
 
     def superposition(self, x, y):
-        '''For two elements of the statevector, x and y, return (x+y)/sqrt(2) and (x-y)/sqrt(2)'''
+        '''For two elements of the state_vector, x and y, return (x+y)/sqrt(2) and (x-y)/sqrt(2)'''
         return [[r2*(x[0]+y[0]),r2*(x[1]+y[1])],
                 [r2*(x[0]-y[0]),r2*(x[1]-y[1])]]
     
     def turn(self, x, y, theta):
-        '''For two elements of the statevector, x and y, return cos(theta/2)*x - i*sin(theta/2)*y and cos(theta/2)*y - i*sin(theta/2)*x'''
+        '''For two elements of the state_vector, x and y, return cos(theta/2)*x - i*sin(theta/2)*y and cos(theta/2)*y - i*sin(theta/2)*x'''
         part1 = [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)]
         part2 = [y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
         return [ part1, part2]
     
     def probability(self, shots):
         probabilities = []
-        for index, value in enumerate(self.statevector): 
+        for index, value in enumerate(self.state_vector): 
             real_part = value[0]
             imaginary_part = value[1]
             probabilities.append(real_part**2+imaginary_part**2)
@@ -104,8 +104,8 @@ class QuantumSimulator:
                 counts[element]=1
         return counts
 
-    def run(self, shots=1024, format="statevector"):
-        self.initialize_statevector()
+    def run(self, shots=1024, format="state_vector"):
+        self.initialize_state_vector()
         for gate in self.circuit:
             if gate[0] in ['x','h','rx']:
                 qubit = gate[1]
@@ -114,18 +114,18 @@ class QuantumSimulator:
                         qb0=counter_qubit+(2**qubit+1)*counter_state
                         qb1=qb0+(2**qubit)
                         if gate[0]=='x':
-                            self.statevector[qb0], self.statevector[qb1] = self.statevector[qb1], self.statevector[qb0]
+                            self.state_vector[qb0], self.state_vector[qb1] = self.state_vector[qb1], self.state_vector[qb0]
                             
                         if gate[0]=='h':
-                            superpositionResult = self.superposition(self.statevector[qb0],self.statevector[qb1])
-                            self.statevector[qb0] = superpositionResult[0]
-                            self.statevector[qb1] = superpositionResult[1]
+                            superpositionResult = self.superposition(self.state_vector[qb0],self.state_vector[qb1])
+                            self.state_vector[qb0] = superpositionResult[0]
+                            self.state_vector[qb1] = superpositionResult[1]
 
                         if gate[0]=='rx':
                             theta = gate[2]
-                            turn = self.turn(self.statevector[qb0],self.statevector[qb1],theta)
-                            self.statevector[qb0] = turn[0]
-                            self.statevector[qb1] = turn[1]
+                            turn = self.turn(self.state_vector[qb0],self.state_vector[qb1],theta)
+                            self.state_vector[qb0] = turn[0]
+                            self.state_vector[qb1] = turn[1]
 
             elif gate[0] == 'cx':
                 control = gate[1]
@@ -139,15 +139,15 @@ class QuantumSimulator:
                         for cx2 in range(2**(self.Qubits-high-1)):
                             qb0 = cx0 + 2**(low+1)*cx1 + 2**(high+1)*cx2 + 2**control  
                             qb1 = qb0 + 2**target 
-                            self.statevector[qb0],self.statevector[qb1] = self.statevector[qb1],self.statevector[qb0]
+                            self.state_vector[qb0],self.state_vector[qb1] = self.state_vector[qb1],self.state_vector[qb0]
         
         if format == "counts":
             return self.get_counts(shots)
         else:
-            return self.statevector
+            return self.state_vector
                            
     def __repr__(self):
-        return str(self.statevector)
+        return str(self.state_vector)
 
 if __name__ == "__main__":
     print('Quantum Simulator for Developers project')
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     print('\ncircuit:') 
     print(qc)
     
-    print('\nsimulate and show statevector:') 
+    print('\nsimulate and show state_vector:') 
     quantumSimulator =  QuantumSimulator(qc)
     result = quantumSimulator.run()
     print(result)
