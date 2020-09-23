@@ -14,7 +14,7 @@ Allow to create your Quantum circuits with the basic Quantum Gates, and you can 
         - memory
 
 # Example:
-'''python
+'''
     print('Quantum Simulator for Developers project')
     qc = QuantumCircuit(5)
     qc.h(0)
